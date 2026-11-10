@@ -1,3 +1,5 @@
+"""Default paths and analysis parameters for the CICIDS2017 PCA pipeline."""
+
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

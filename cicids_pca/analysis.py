@@ -1,3 +1,5 @@
+"""Standardized PCA, component summaries, and anomaly-score calculations."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -18,10 +20,12 @@ def _top_anomalies(
     q_residual: np.ndarray,
     count: int = 10,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Return the highest-scoring row positions for T-squared and Q-residual."""
     row_count = len(t_squared)
     selected_count = min(count, row_count)
 
     def top_rows(values: np.ndarray, column: str) -> pd.DataFrame:
+        """Build a descending table of observation positions and metric values."""
         positions = np.argpartition(values, row_count - selected_count)[-selected_count:]
         positions = positions[np.argsort(values[positions])[::-1]]
         return pd.DataFrame({
@@ -35,6 +39,8 @@ def _top_anomalies(
 
 @dataclass
 class PCAResults:
+    """PCA models, projections, variance summaries, and anomaly rankings."""
+
     full_pca: PCA
     pca: PCA
     scores: np.ndarray
@@ -53,7 +59,24 @@ def analyze_pca(
     requested_components: int = PCA_COMPONENTS,
     variance_threshold: float = VARIANCE_THRESHOLD,
 ) -> PCAResults:
-    """Standardize predictors and calculate full and retained PCA solutions."""
+    """Standardize predictors and calculate PCA summaries and anomaly scores.
+
+    The full model supplies eigenvalues and the Kaiser retention count. The
+    requested number of components supplies scores/loadings, while T-squared
+    and Q-residual are calculated from all components satisfying Kaiser.
+
+    Args:
+        features: Finite numeric predictor matrix.
+        requested_components: Maximum number of components to expose as scores
+            and loadings.
+        variance_threshold: Cumulative explained-variance target, in percent.
+
+    Returns:
+        A result object containing fitted models, projections, and summaries.
+
+    Raises:
+        ValueError: If the input, requested settings, or Kaiser solution is invalid.
+    """
     if features.empty:
         raise ValueError("A matriz de atributos está vazia.")
     if features.shape[0] < 2:

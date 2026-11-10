@@ -1,3 +1,5 @@
+"""PowerPoint slide construction for the CICIDS2017 PCA analysis."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,6 +16,7 @@ from .data import CleaningSummary, FeatureSummary
 
 
 def _rgb(r: int, g: int, b: int) -> RGBColor:
+    """Create a PowerPoint RGB color."""
     return RGBColor(r, g, b)
 
 
@@ -27,6 +30,7 @@ MUTED = _rgb(108, 117, 125)
 
 
 def _background(slide, width: float = 13.333, height: float = 7.5) -> None:
+    """Apply the presentation background to a slide."""
     shape = slide.shapes.add_shape(1, 0, 0, Inches(width), Inches(height))
     shape.fill.solid()
     shape.fill.fore_color.rgb = BG
@@ -34,6 +38,7 @@ def _background(slide, width: float = 13.333, height: float = 7.5) -> None:
 
 
 def _header(slide, title: str) -> None:
+    """Add the course heading and slide title."""
     box = slide.shapes.add_textbox(Inches(0.8), Inches(0.35), Inches(11.7), Inches(0.95))
     frame = box.text_frame
     frame.word_wrap = True
@@ -50,6 +55,7 @@ def _header(slide, title: str) -> None:
 
 
 def _card(slide, left, top, width, height, title: str, paragraphs: list[str], font_size: int = 13) -> None:
+    """Place a styled text card on a slide."""
     shape = slide.shapes.add_shape(1, left, top, width, height)
     shape.fill.solid()
     shape.fill.fore_color.rgb = CARD
@@ -73,6 +79,7 @@ def _card(slide, left, top, width, height, title: str, paragraphs: list[str], fo
 
 
 def _text(slide, text: str, left, top, width, height, size: int = 12, color: RGBColor = TEXT, italic: bool = False) -> None:
+    """Place a single formatted text paragraph on a slide."""
     box = slide.shapes.add_textbox(left, top, width, height)
     box.text_frame.word_wrap = True
     p = box.text_frame.paragraphs[0]
@@ -83,6 +90,7 @@ def _text(slide, text: str, left, top, width, height, size: int = 12, color: RGB
 
 
 def _picture_contain(slide, image_path: Path, left, top, max_width, max_height) -> None:
+    """Place an image inside a bounding box without changing its aspect ratio."""
     if not image_path.is_file():
         raise FileNotFoundError(f"Imagem para apresentação não existe: {image_path}")
     picture = slide.shapes.add_picture(str(image_path), left, top)
@@ -94,6 +102,7 @@ def _picture_contain(slide, image_path: Path, left, top, max_width, max_height) 
 
 
 def _loading_card(slide, name: str, results: PCAResults, left, top, width, height) -> None:
+    """Render a component's variance, dominant loadings, and interpretation."""
     card = slide.shapes.add_shape(1, left, top, width, height)
     card.fill.solid()
     card.fill.fore_color.rgb = CARD
@@ -153,6 +162,25 @@ def build_presentation(
     feature_count: int,
     class_names: list[str],
 ) -> Path:
+    """Build and save the complete PCA presentation.
+
+    Args:
+        output_path: Destination PowerPoint file.
+        output_dir: Directory containing the plot images used in slides.
+        results: PCA models and derived component/anomaly results.
+        correlation_pairs: Strongest variable correlations for the narrative.
+        cleaning: Dataset cleaning counts.
+        features: Predictor preparation summary.
+        row_count: Number of retained observations.
+        feature_count: Number of predictors used in the PCA.
+        class_names: Distinct target labels included in the dataset.
+
+    Returns:
+        The path of the saved presentation.
+
+    Raises:
+        FileNotFoundError: If a required plot image is missing.
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     prs = Presentation()
     prs.slide_width = Inches(13.333)

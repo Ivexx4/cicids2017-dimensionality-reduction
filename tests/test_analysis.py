@@ -1,3 +1,5 @@
+"""Tests for PCA model summaries and anomaly-score calculations."""
+
 import unittest
 
 import numpy as np
@@ -8,7 +10,10 @@ from cicids_pca.analysis import analyze_pca
 
 
 class AnalyzePcaTests(unittest.TestCase):
+    """Verify PCA anomaly rankings against direct numerical calculations."""
+
     def test_hotelling_and_q_residual_match_kaiser_model(self):
+        """Check the top T-squared and Q-residual values against the Kaiser model."""
         rng = np.random.default_rng(42)
         values = rng.normal(size=(80, 6))
         values[0, 0] = 9.0

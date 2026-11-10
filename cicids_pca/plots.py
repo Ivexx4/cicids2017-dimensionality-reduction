@@ -1,3 +1,5 @@
+"""Plot generation for correlation, PCA components, projections, and outliers."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,6 +16,7 @@ from .config import KAISER_PLOT_COMPONENTS, RANDOM_SEED
 
 
 def plot_correlations(features: pd.DataFrame, output_dir: Path) -> tuple[pd.DataFrame, list[tuple[str, str, float]], Path]:
+    """Save a correlation heatmap and return the strongest variable pairs."""
     output_dir.mkdir(parents=True, exist_ok=True)
     correlation = features.corr()
     upper = correlation.where(np.triu(np.ones(correlation.shape, dtype=bool), k=1)).stack()
@@ -36,6 +39,7 @@ def plot_correlations(features: pd.DataFrame, output_dir: Path) -> tuple[pd.Data
 
 
 def plot_kaiser(results: PCAResults, output_dir: Path) -> Path:
+    """Save the eigenvalue bar chart, limited to the configured PC count."""
     values = results.full_pca.explained_variance_
     count = min(KAISER_PLOT_COMPONENTS, len(values))
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -56,6 +60,7 @@ def plot_kaiser(results: PCAResults, output_dir: Path) -> Path:
 
 
 def plot_scree(results: PCAResults, output_dir: Path) -> Path:
+    """Save cumulative explained variance and mark the configured threshold."""
     ratios = results.full_pca.explained_variance_ratio_
     cumulative = np.cumsum(ratios) * 100
     count = results.variance_threshold_count
@@ -84,6 +89,7 @@ def plot_scree(results: PCAResults, output_dir: Path) -> Path:
 
 
 def plot_loadings(results: PCAResults, output_dir: Path) -> Path:
+    """Save a heatmap of the calculated loadings, ordered by absolute PC1 value."""
     loadings = results.loadings
     order = loadings["PC1"].abs().sort_values(ascending=False).index
     fig, ax = plt.subplots(figsize=(18, 11))
@@ -105,6 +111,7 @@ def plot_loadings(results: PCAResults, output_dir: Path) -> Path:
 
 
 def plot_scores(results: PCAResults, target: pd.Series, output_dir: Path) -> tuple[Path, Path]:
+    """Save the PC1-versus-PC2 class plot and the multi-component score panel."""
     output_dir.mkdir(parents=True, exist_ok=True)
     score_frame = pd.DataFrame(results.scores, columns=results.analyzed_components)
     score_frame["Attack Type"] = target.to_numpy()
@@ -178,6 +185,7 @@ def plot_scores(results: PCAResults, target: pd.Series, output_dir: Path) -> tup
 
 
 def plot_biplot(results: PCAResults, target: pd.Series, output_dir: Path) -> Path:
+    """Save a PC1–PC2 biplot with sampled observations and strongest loadings."""
     output_dir.mkdir(parents=True, exist_ok=True)
     score_frame = pd.DataFrame(results.scores[:, :2], columns=["PC1", "PC2"])
     score_frame["Attack Type"] = target.to_numpy()
@@ -224,6 +232,7 @@ def plot_biplot(results: PCAResults, target: pd.Series, output_dir: Path) -> Pat
 
 
 def plot_anomalies(results: PCAResults, target: pd.Series, output_dir: Path) -> Path:
+    """Save horizontal bar charts for the top Hotelling T² and Q-residual rows."""
     output_dir.mkdir(parents=True, exist_ok=True)
     hotelling = results.top_hotelling.copy()
     residuals = results.top_q_residual.copy()

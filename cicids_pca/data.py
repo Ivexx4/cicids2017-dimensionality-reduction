@@ -1,3 +1,5 @@
+"""Dataset retrieval, CICFlowMeter cleaning, and PCA feature preparation."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,6 +14,8 @@ from .config import CHUNK_SIZE, DATASET_SLUG, DEFAULT_DATA_DIR, EXPECTED_CSV_NAM
 
 @dataclass
 class CleaningSummary:
+    """Counts of original, retained, and invalid flow records."""
+
     original_rows: int
     retained_rows: int
     removed_rows: int
@@ -23,6 +27,8 @@ class CleaningSummary:
 
 @dataclass
 class FeatureSummary:
+    """Summary of non-finite value handling and removed predictor columns."""
+
     infinite_values: int
     missing_values_imputed: int
     all_missing_columns: list[str]
@@ -31,7 +37,18 @@ class FeatureSummary:
 
 
 def ensure_dataset(csv_path: Path | None = None, data_dir: Path = DEFAULT_DATA_DIR) -> Path:
-    """Return a local CSV, downloading the Kaggle dataset if necessary."""
+    """Resolve the input CSV, downloading and extracting it from Kaggle if needed.
+
+    Args:
+        csv_path: Optional path to an already downloaded CSV.
+        data_dir: Directory used to store and search for the Kaggle dataset.
+
+    Returns:
+        The resolved path to the dataset CSV.
+
+    Raises:
+        FileNotFoundError: If the provided path is missing or no unique CSV is found.
+    """
     if csv_path is not None:
         csv_path = Path(csv_path).expanduser().resolve()
         if not csv_path.is_file():
@@ -61,7 +78,18 @@ def ensure_dataset(csv_path: Path | None = None, data_dir: Path = DEFAULT_DATA_D
 
 
 def load_and_clean_data(csv_path: Path, chunksize: int = CHUNK_SIZE) -> tuple[pd.DataFrame, str, CleaningSummary]:
-    """Load CSV in chunks and remove flows invalid under the CICFlowMeter rules."""
+    """Load the dataset in chunks and remove records with CICFlowMeter error values.
+
+    Args:
+        csv_path: Path to the source dataset.
+        chunksize: Number of rows to read per chunk.
+
+    Returns:
+        The cleaned rows, target-column name, and counts describing the cleaning.
+
+    Raises:
+        ValueError: If required columns or usable records are missing.
+    """
     cleaned_chunks: list[pd.DataFrame] = []
     original_rows = removed_rows = 0
     forward_minus_one = backward_minus_one = negative_min_segment = 0
@@ -121,7 +149,21 @@ def load_and_clean_data(csv_path: Path, chunksize: int = CHUNK_SIZE) -> tuple[pd
 def prepare_features(
     frame: pd.DataFrame, target_col: str
 ) -> tuple[pd.DataFrame, pd.Series, list[str], FeatureSummary]:
-    """Select numeric predictors, impute non-finite values, and drop empty/constant columns."""
+    """Select and clean numeric predictors for PCA while keeping the class labels.
+
+    Infinite values are treated as missing and imputed with column medians;
+    entirely missing and constant predictors are removed.
+
+    Args:
+        frame: Cleaned input records.
+        target_col: Name of the class-label column to preserve separately.
+
+    Returns:
+        Predictors, target labels, retained predictor names, and a cleaning summary.
+
+    Raises:
+        ValueError: If no usable numeric predictors remain.
+    """
     numeric_columns = frame.select_dtypes(include=[np.number]).columns.tolist()
     excluded = [name for name in ("Destination Port", target_col) if name in numeric_columns]
     feature_columns = [name for name in numeric_columns if name not in excluded]

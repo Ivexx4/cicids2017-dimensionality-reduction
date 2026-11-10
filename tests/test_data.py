@@ -1,3 +1,5 @@
+"""Tests for dataset cleaning and numeric feature preparation."""
+
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -9,7 +11,10 @@ from cicids_pca.data import load_and_clean_data, prepare_features
 
 
 class PrepareFeaturesTests(unittest.TestCase):
+    """Verify missing-value handling and removal of unusable predictors."""
+
     def test_handles_infinite_missing_empty_and_constant_columns(self):
+        """Impute non-finite values and remove empty and constant columns."""
         frame = pd.DataFrame(
             {
                 **{f"feature_{i}": [1.0, 2.0, 3.0, 4.0] for i in range(51)},
@@ -35,6 +40,7 @@ class PrepareFeaturesTests(unittest.TestCase):
         self.assertEqual(target.tolist(), ["Normal", "DoS", "Normal", "DDoS"])
 
     def test_raises_when_no_valid_predictors_remain(self):
+        """Reject a dataset when all numeric predictors are constant."""
         frame = pd.DataFrame(
             {
                 **{f"feature_{i}": [1.0, 1.0] for i in range(51)},
@@ -46,7 +52,10 @@ class PrepareFeaturesTests(unittest.TestCase):
 
 
 class LoadAndCleanDataTests(unittest.TestCase):
+    """Verify chunked loading and invalid-flow filtering."""
+
     def test_removes_union_of_invalid_flow_rules_and_counts_classes(self):
+        """Remove the union of invalid-flow cases and preserve class counts."""
         frame = pd.DataFrame(
             {
                 "Init_Win_bytes_forward": [-1, 0, 0, 0],
