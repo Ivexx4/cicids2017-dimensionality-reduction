@@ -1,0 +1,39 @@
+MIT License with Release-Timing Condition
+
+Copyright (c) 2026 Ivo Rosa
+
+Additional Release-Timing Condition
+
+Notwithstanding the permissions granted below, no Licensee may publish, release,
+distribute, or otherwise make available a subsequent or modified version of this
+Project before 16 November 2026 at 23:59:00 Europe/Lisbon time. This condition
+does not prohibit private modification, use, evaluation, or submission of the
+current version of the Project as academic work. Publication of a subsequent or
+modified version is permitted only after that time.
+
+Forks
+
+Any person creating or maintaining a fork of this Project may remove or omit the
+release-timing condition from the fork and from versions distributed from that
+fork. The fork must retain this copyright notice and the other terms of this
+license, unless its maintainer supplies a different license for their own
+original contributions. Removing the condition from a fork does not remove it
+from this original Project.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, subject to the release-timing condition above and the
+following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

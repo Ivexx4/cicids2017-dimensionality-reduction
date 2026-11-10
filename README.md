@@ -1,55 +1,290 @@
-# CICIDS2017 PCA
+# cicids2017-dimensionality-reduction
 
-A análise de componentes principais (PCA) do CICIDS2017 está organizada em módulos Python: carregamento e limpeza dos dados, análise, gráficos e apresentação. Os resultados são guardados na pasta `output/`.
+Principal Component Analysis (PCA) applied to the CICIDS2017 intrusion detection dataset for dimensionality reduction, exploratory data analysis, feature interpretation, and anomaly detection.
 
-## Requisitos e instalação no Windows
+## Overview
 
-1. Instale Python 3.10 ou superior.
-2. O ambiente virtual (`.venv`) é local e não é distribuído com o projeto. Crie-o e ative-o no PowerShell:
+This project explores the application of Principal Component Analysis (PCA) to the CICIDS2017 dataset, a widely used benchmark for network intrusion detection research.
 
-   ```powershell
-   py -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   python -m pip install -r requirements.txt
-   ```
+The analysis focuses on:
 
-3. Para descarregar automaticamente o dataset, crie um token em Kaggle → Settings → API → Create New Token e guarde o ficheiro `kaggle.json` em `%USERPROFILE%\.kaggle\kaggle.json`. Aceite previamente os termos de acesso ao dataset no Kaggle. Não inclua o token no projeto.
-4. Execute a análise:
+- Exploratory Data Analysis (EDA);
+- Data cleaning and preprocessing;
+- Feature standardization;
+- Dimensionality reduction through PCA;
+- Selection and interpretation of principal components;
+- Analysis of scores and loadings;
+- Detection of potentially anomalous observations using Hotelling's T² and Q-residual statistics.
 
-   ```powershell
-   python run_analysis.py
-   ```
+The codebase is organized into modular Python components responsible for data loading, preprocessing, PCA analysis, visualization, and report generation. All outputs are stored in the `output/` directory.
 
-   Se ainda não existir localmente, o CSV é descarregado e extraído em `data\cicids2017-cleaned-and-preprocessed\`.
+---
 
-Se já tiver o CSV, pode indicar o caminho diretamente, sem autenticação Kaggle:
+## Dataset
 
-```powershell
-python run_analysis.py --csv "C:\caminho\cicids2017_cleaned.csv"
+### CICIDS2017
+
+The Canadian Institute for Cybersecurity Intrusion Detection Evaluation Dataset (CICIDS2017) contains realistic network traffic data including both benign activity and multiple types of cyberattacks.
+
+Dataset source:
+
+- Canadian Institute for Cybersecurity (CIC)
+- Available through Kaggle
+
+---
+
+## Project Structure
+
+```text
+cicids2017-dimensionality-reduction/
+│
+├── data/
+├── output/
+├── scripts/
+├── run_analysis.py
+├── requirements.txt
+├── README.md
+└── .venv/
 ```
 
-Opções disponíveis:
+---
 
-- `--csv`: caminho para um CSV local.
-- `--data-dir`: pasta para procurar/descarregar o dataset.
-- `--output-dir`: pasta para guardar os resultados.
-- `--chunksize`: número de linhas por bloco durante a leitura.
-- `--components`: número de componentes para loadings e scores (predefinição: 14).
-- `--variance-threshold`: meta de variância acumulada em percentagem (predefinição: 80).
+## Requirements
 
-## Preparação dos dados e análise
+- Python 3.10+
+- Windows PowerShell (recommended)
+- Kaggle API credentials (optional if a local CSV is available)
 
-O programa remove registos inválidos de acordo com as regras CICFlowMeter aplicadas, converte infinitos em valores em falta, imputa os NaNs pela mediana e remove colunas vazias ou constantes antes da PCA. `Destination Port` é excluída dos preditores e a coluna de classe é usada para identificar as classes nos gráficos, não como entrada da PCA.
+---
 
-A análise inclui o critério de Kaiser (autovalores superiores a 1), o scree plot, loadings e scores até ao número de componentes configurado, com predefinição PC14. O biplot mostra scores e loadings para PC1–PC2.
+## Installation
 
-Para a análise de observações atípicas, o modelo retém as componentes com autovalor superior a 1. Hotelling T² mede a distância no espaço das componentes retidas; Q-residual mede a variação que esse modelo não explica. Os resultados identificam observações para investigação, mas não confirmam, por si só, a existência de ataques. A numeração das observações nos CSV corresponde à ordem dos registos após a limpeza.
+Create and activate a virtual environment:
 
-## Ficheiros de saída
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
 
-Em `output/` são gerados:
+---
 
-- `Análise_PCA_CICIDS2017.pptx`, com os gráficos e interpretações;
-- gráficos de correlação, critério de Kaiser, variância acumulada, loadings, scores, biplot e outliers;
-- `variancia_componentes.csv`, `loadings.csv` e `loadings_dominantes.csv`;
-- `top10_hotelling_t2.csv` e `top10_q_residual.csv`, com as dez observações mais extremas e as respetivas classes.
+## Dataset Download (Kaggle)
+
+If the dataset is not already available locally, the project can download it automatically using the Kaggle API.
+
+### Step 1
+
+Create a Kaggle API token:
+
+1. Sign in to Kaggle.
+2. Navigate to **Settings**.
+3. Under **API**, select **Create New Token**.
+
+### Step 2
+
+Save the downloaded `kaggle.json` file to:
+
+```text
+%USERPROFILE%\.kaggle\kaggle.json
+```
+
+### Step 3
+
+Accept the dataset terms on Kaggle before running the script.
+
+> Never commit or share your Kaggle API token.
+
+---
+
+## Running the Analysis
+
+Execute the complete PCA pipeline:
+
+```powershell
+python run_analysis.py
+```
+
+If the dataset is not found locally, it will be downloaded and extracted automatically to:
+
+```text
+data\cicids2017-cleaned-and-preprocessed\
+```
+
+---
+
+## Using an Existing CSV
+
+If the dataset is already available locally, a Kaggle account is not required.
+
+```powershell
+python run_analysis.py --csv "C:\path\to\cicids2017_cleaned.csv"
+```
+
+---
+
+## Command-Line Options
+
+| Argument | Description |
+|-----------|------------|
+| `--csv` | Path to a local CSV file |
+| `--data-dir` | Directory used to store or search for the dataset |
+| `--output-dir` | Directory used to store generated results |
+| `--chunksize` | Number of rows processed per chunk |
+| `--components` | Number of principal components used for loadings and scores (default: 14) |
+| `--variance-threshold` | Target cumulative explained variance percentage (default: 80) |
+
+Example:
+
+```powershell
+python run_analysis.py ^
+  --components 14 ^
+  --variance-threshold 80
+```
+
+---
+
+## Data Preprocessing
+
+Before applying PCA, the dataset undergoes several preprocessing steps:
+
+- Removal of invalid records according to CICFlowMeter rules;
+- Conversion of infinite values into missing values;
+- Median imputation of missing values;
+- Removal of empty columns;
+- Removal of constant features;
+- Feature standardization using Z-score normalization.
+
+Additional considerations:
+
+- `Destination Port` is excluded from PCA predictors;
+- The target class is used exclusively for visualization and interpretation;
+- Class labels are not used as PCA inputs.
+
+---
+
+## PCA Analysis
+
+The project performs:
+
+### Correlation Analysis
+
+Feature correlation matrix and heatmap generation.
+
+### Principal Component Selection
+
+Component retention is evaluated using:
+
+- Kaiser Criterion (eigenvalues > 1);
+- Scree Plot;
+- Cumulative Explained Variance.
+
+### Loadings Analysis
+
+Identification of the variables with the highest contribution to each principal component.
+
+### Scores Analysis
+
+Projection of observations into the reduced feature space.
+
+### Biplot
+
+Combined visualization of:
+
+- PCA scores;
+- PCA loadings;
+
+for the first two principal components.
+
+---
+
+## Outlier Detection
+
+The PCA model retains the principal components with eigenvalues greater than 1.
+
+Two statistics are used:
+
+### Hotelling's T²
+
+Measures the distance of observations within the retained PCA subspace.
+
+### Q-Residual (Squared Prediction Error)
+
+Measures the unexplained variation remaining after projection onto the PCA model.
+
+These metrics identify observations worthy of further investigation, but they do not, by themselves, confirm the presence of malicious traffic.
+
+Observation indices reported in the results correspond to the dataset ordering after preprocessing.
+
+---
+
+## Generated Outputs
+
+The `output/` directory includes:
+
+### Presentation
+
+```text
+Análise_PCA_CICIDS2017.pptx
+```
+
+A complete presentation containing:
+
+- methodology;
+- figures;
+- statistical interpretation;
+- PCA results.
+
+### Visualizations
+
+- Correlation heatmap;
+- Kaiser criterion plot;
+- Cumulative explained variance plot;
+- Loading plots;
+- Score plots;
+- PCA biplot;
+- Hotelling's T² plot;
+- Q-residual plot.
+
+### Tables
+
+```text
+variancia_componentes.csv
+loadings.csv
+loadings_dominantes.csv
+top10_hotelling_t2.csv
+top10_q_residual.csv
+```
+
+---
+
+## Key Findings
+
+This analysis demonstrates that PCA can significantly reduce the dimensionality of the CICIDS2017 dataset while preserving most of its information content.
+
+The methodology enables:
+
+- Identification of dominant traffic characteristics;
+- Exploration of relationships between network features;
+- Visualization of latent structures;
+- Detection of observations exhibiting unusual behavior.
+
+---
+
+## Technologies
+
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- Matplotlib
+- Seaborn
+- Kaggle API
+
+---
+
+## License
+
+This project is distributed under the MIT License with an additional release-timing condition. Subsequent or modified versions of this project may not be published before **16 November 2026 at 23:59 (Europe/Lisbon time)**. A fork's maintainer may remove or omit that timing condition from the fork, as described in [`LICENSE`](LICENSE).
+
+Because of this extra condition, this is a customized MIT-based license, not the standard MIT License or an OSI-approved open-source license.
