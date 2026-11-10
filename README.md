@@ -57,6 +57,12 @@ cicids2017-dimensionality-reduction/
 
 ---
 
+## Automatic Validation
+
+GitHub Actions runs on every push and pull request. It checks Python syntax and runs the unit tests on Python 3.10, 3.13, and the latest stable Python 3 release (`3.x`). The checks use synthetic test data and do not require Kaggle credentials or the CICIDS2017 dataset.
+
+---
+
 ## Installation
 
 Create and activate a virtual environment:
