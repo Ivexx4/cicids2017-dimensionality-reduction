@@ -1,0 +1,30 @@
+# Local Python environments
+.venv/
+venv/
+env/
+
+# IDE and editor settings
+.idea/
+.vscode/
+.vs/
+.fleet/
+.zed/
+*.iml
+*.suo
+*.user
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*.pyd
+
+# Local datasets and generated analysis outputs
+/data/
+/output/
+
+# Kaggle API credentials
+.kaggle/
+kaggle.json
+
+# Jupyter temporary files
+.ipynb_checkpoints/
